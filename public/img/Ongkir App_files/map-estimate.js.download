@@ -1,0 +1,40 @@
+mapboxgl.accessToken =
+    "pk.eyJ1IjoiaWxoYW1iYXloYXFpIiwiYSI6ImNrdml6MTdnaWNveGIzMW56cTkxeXoxMm8ifQ.m2jcKpjbYBcBdSidMRz0YA";
+const map = new mapboxgl.Map({
+    container: "map",
+    style: "mapbox://styles/mapbox/streets-v11",
+    center: [112.79754314113003, -7.279546984580927],
+    zoom: 8,
+});
+
+const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken, // Set the access token
+    mapboxgl: mapboxgl, // Set the mapbox-gl instance
+    marker: false, // Do not use the default marker style
+});
+
+document.getElementById('kota-asal').appendChild(geocoder.onAdd(map));
+
+map.on("load", () => {
+    map.addSource("single-point", {
+        type: "geojson",
+        data: {
+            type: "FeatureCollection",
+            features: [],
+        },
+    });
+
+    map.addLayer({
+        id: "point",
+        source: "single-point",
+        type: "circle",
+        paint: {
+            "circle-radius": 10,
+            "circle-color": "#448ee4",
+        },
+    });
+
+    geocoder.on("result", (event) => {
+        map.getSource("single-point").setData(event.result.geometry);
+    });
+});
